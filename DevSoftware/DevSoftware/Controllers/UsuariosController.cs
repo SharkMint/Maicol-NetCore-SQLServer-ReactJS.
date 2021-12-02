@@ -1,6 +1,7 @@
 ﻿using DevSoftware.Context;
 using DevSoftware.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,28 +31,60 @@ namespace DevSoftware.Controllers
 
         // GET api/<ValuesController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public Usuarios Get(int id)
         {
             var Usuarios = context.Usuarios.FirstOrDefault(p => p.Id == id);
-            return "value";
+            return Usuarios;
         }
 
         // POST api/<ValuesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] Usuarios usuarios)
         {
+            try
+            {
+            context.Usuarios.Add(usuarios);
+            context.SaveChanges();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
         }
 
         // PUT api/<ValuesController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, [FromBody] Usuarios usuarios)
         {
+            if (usuarios.Id == id)
+            {
+                context.Entry(usuarios).State = EntityState.Modified;
+                context.SaveChanges();
+                return Ok();
+            } 
+            else
+            {
+                return BadRequest();
+            }
         }
 
         // DELETE api/<ValuesController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            var usuarios = context.Usuarios.FirstOrDefault(p => p.Id == id);
+            if (usuarios != null)
+            {
+                context.Usuarios.Remove(usuarios);
+                context.SaveChanges();
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
